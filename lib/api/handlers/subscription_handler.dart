@@ -13,7 +13,17 @@ class SubscriptionHandler {
     router.post('/', _createSubscription);
     router.post('/trigger-check', _triggerCheck);
     router.get('/user/<userId>', _getUserSubscriptions);
+    router.delete('/<id>', _deleteSubscription);
     return router;
+  }
+
+  Future<Response> _deleteSubscription(Request request, String id) async {
+    try {
+      await _service.deleteSubscription(id);
+      return Response.ok(jsonEncode({'message': 'Subscription deleted'}));
+    } catch (e) {
+      return Response.internalServerError(body: jsonEncode({'error': e.toString()}));
+    }
   }
 
   Future<Response> _triggerCheck(Request request) async {

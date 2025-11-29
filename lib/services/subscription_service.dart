@@ -42,6 +42,10 @@ class SubscriptionService {
     return _subRepo.getSubscriptionsByUser(userId);
   }
 
+  Future<void> deleteSubscription(String subscriptionId) {
+    return _subRepo.deleteSubscription(subscriptionId);
+  }
+
   Future<List<Map<String, dynamic>>> checkAndNotify() async {
     // 1. Find subscriptions where expiry == threshold
     final due = await _subRepo.getDueSubscriptions();

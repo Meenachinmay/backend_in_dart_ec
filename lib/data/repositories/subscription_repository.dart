@@ -42,6 +42,13 @@ class SubscriptionRepository {
     return result.map((row) => _mapRowToSubscription(row)).toList();
   }
 
+  Future<void> deleteSubscription(String id) async {
+    await _db.connection.execute(
+      Sql.named('DELETE FROM subscriptions WHERE id = @id'),
+      parameters: {'id': id},
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getDueSubscriptions() async {
     final result = await _db.connection.execute('''
       SELECT s.id as sub_id, u.email, i.name as item_name, i.expiry_in

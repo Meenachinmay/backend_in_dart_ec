@@ -1,0 +1,24 @@
+# See https://dart.dev/guides/libraries/private-files
+
+# Files and directories created by pub
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# Documentation
+doc/api/
+
+# Node
+node_modules/
+
+# Docker
+db_data/
+.env
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws

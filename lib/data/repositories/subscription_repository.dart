@@ -30,7 +30,12 @@ class SubscriptionRepository {
 
   Future<List<Subscription>> getSubscriptionsByUser(String userId) async {
     final result = await _db.connection.execute(
-      Sql.named('SELECT * FROM subscriptions WHERE user_id = @userId'),
+      Sql.named('''
+        SELECT s.*, i.name as item_name 
+        FROM subscriptions s
+        JOIN inventory i ON s.inventory_id = i.id
+        WHERE s.user_id = @userId
+      '''),
       parameters: {'userId': userId},
     );
 
@@ -65,6 +70,7 @@ class SubscriptionRepository {
       inventoryId: map['inventory_id'] as String,
       alertThreshold: map['alert_threshold'] as int,
       createdAt: map['created_at'] as DateTime,
+      itemName: map['item_name'] as String?,
     );
   }
 }

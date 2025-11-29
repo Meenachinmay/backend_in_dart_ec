@@ -49,9 +49,10 @@ class SubscriptionHandler {
         inventoryId: inventoryId,
         alertThreshold: alertThreshold is int ? alertThreshold : int.parse(alertThreshold.toString()),
       );
-
+      
       return Response.ok(jsonEncode(sub.toJson()), headers: {'content-type': 'application/json'});
-    } catch (e) {
+    } catch (e, stack) {
+      print('Error creating subscription: $e\n$stack');
       return Response.internalServerError(body: jsonEncode({'error': e.toString()}));
     }
   }

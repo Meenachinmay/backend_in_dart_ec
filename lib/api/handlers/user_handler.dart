@@ -20,12 +20,13 @@ class UserHandler {
       final payload = await request.readAsString();
       final data = jsonDecode(payload);
       final email = data['email'];
+      final id = data['id'];
 
-      if (email == null) {
-        return Response.badRequest(body: jsonEncode({'error': 'Email is required'}));
+      if (email == null || id == null) {
+        return Response.badRequest(body: jsonEncode({'error': 'Email and ID are required'}));
       }
 
-      final user = await _repo.createUser(email);
+      final user = await _repo.createUser(id, email);
       return Response.ok(jsonEncode(user.toJson()), headers: {'content-type': 'application/json'});
     } catch (e) {
       return Response.internalServerError(body: jsonEncode({'error': e.toString()}));

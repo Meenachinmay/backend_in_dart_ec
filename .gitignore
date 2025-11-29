@@ -15,6 +15,7 @@ node_modules/
 # Docker
 db_data/
 .env
+service_account.json
 
 # IDEs
 .idea/

@@ -7,14 +7,19 @@ class UserRepository {
 
   UserRepository(this._db);
 
-  Future<User> createUser(String email) async {
+  Future<User> createUser(String id, String email) async {
     final result = await _db.connection.execute(
-      Sql.named('INSERT INTO users (email) VALUES (@email) RETURNING *'),
-      parameters: {'email': email},
+      Sql.named('''
+        INSERT INTO users (id, email) 
+        VALUES (@id, @email) 
+        ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email 
+        RETURNING *
+      '''),
+      parameters: {'id': id, 'email': email},
     );
 
     if (result.isEmpty) {
-      throw Exception('Failed to create user');
+      throw Exception('Failed to create or retrieve user');
     }
 
     return _mapRowToUser(result.first);

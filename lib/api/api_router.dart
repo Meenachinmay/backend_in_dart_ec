@@ -4,16 +4,19 @@ import 'handlers/user_handler.dart';
 import 'handlers/inventory_handler.dart';
 import 'handlers/subscription_handler.dart';
 import 'middleware/auth_middleware.dart';
+import '../services/firebase_service.dart';
 
 class ApiRouter {
   final UserHandler userHandler;
   final InventoryHandler inventoryHandler;
   final SubscriptionHandler subscriptionHandler;
+  final FirebaseService firebaseService;
 
   ApiRouter({
     required this.userHandler,
     required this.inventoryHandler,
     required this.subscriptionHandler,
+    required this.firebaseService,
   });
 
   Handler get handler {
@@ -27,7 +30,7 @@ class ApiRouter {
 
     final pipeline = Pipeline()
       .addMiddleware(logRequests())
-      .addMiddleware(firebaseAuthMiddleware());
+      .addMiddleware(firebaseAuthMiddleware(firebaseService));
 
     return pipeline.addHandler(router.call);
   }

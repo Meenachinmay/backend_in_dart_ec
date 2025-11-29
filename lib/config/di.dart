@@ -7,6 +7,7 @@ import '../data/repositories/inventory_repository.dart';
 import '../data/repositories/subscription_repository.dart';
 import '../services/inventory_service.dart';
 import '../services/subscription_service.dart';
+import '../services/firebase_service.dart';
 import '../api/handlers/user_handler.dart';
 import '../api/handlers/inventory_handler.dart';
 import '../api/handlers/subscription_handler.dart';
@@ -20,6 +21,22 @@ Future<void> setupDI() async {
   if (File('.env').existsSync()) {
     env.load();
   }
+
+  // Firebase
+  final firebaseService = FirebaseService('service_account.json');
+  // We initialize asynchronously. Ideally we should await it, but if file is missing
+  // we might want to fail or warn. For this requirement, we'll await.
+  try {
+    if (File('service_account.json').existsSync()) {
+      await firebaseService.initialize();
+      print('Firebase initialized successfully');
+    } else {
+      print('WARNING: service_account.json not found. Firebase features will fail.');
+    }
+  } catch (e) {
+    print('Failed to initialize Firebase: $e');
+  }
+  getIt.registerSingleton<FirebaseService>(firebaseService);
 
   // DB Connection
   final dbHost = env['DB_HOST'] ?? 'localhost';
@@ -49,6 +66,7 @@ Future<void> setupDI() async {
     getIt<SubscriptionRepository>(),
     getIt<UserRepository>(),
     getIt<InventoryRepository>(),
+    getIt<FirebaseService>(),
   ));
 
   // Handlers
@@ -61,5 +79,6 @@ Future<void> setupDI() async {
     userHandler: getIt<UserHandler>(),
     inventoryHandler: getIt<InventoryHandler>(),
     subscriptionHandler: getIt<SubscriptionHandler>(),
+    firebaseService: getIt<FirebaseService>(),
   ));
 }

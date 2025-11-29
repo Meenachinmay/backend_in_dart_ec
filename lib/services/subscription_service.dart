@@ -2,13 +2,20 @@ import '../data/repositories/subscription_repository.dart';
 import '../data/repositories/user_repository.dart';
 import '../data/repositories/inventory_repository.dart';
 import '../domain/models/subscription.dart';
+import 'firebase_service.dart';
 
 class SubscriptionService {
   final SubscriptionRepository _subRepo;
   final UserRepository _userRepo;
   final InventoryRepository _inventoryRepo;
+  final FirebaseService _firebaseService;
 
-  SubscriptionService(this._subRepo, this._userRepo, this._inventoryRepo);
+  SubscriptionService(
+    this._subRepo,
+    this._userRepo,
+    this._inventoryRepo,
+    this._firebaseService,
+  );
 
   Future<Subscription> subscribeUser({
     required String userId,
@@ -39,8 +46,21 @@ class SubscriptionService {
     // 1. Find subscriptions where expiry == threshold
     final due = await _subRepo.getDueSubscriptions();
     
-    // 2. In a real app, we would queue emails/push notifications here.
-    // For this prototype, we return the list of notifications that *would* be sent.
+    // 2. Write to Firestore
+    for (final notification in due) {
+      try {
+        await _firebaseService.addNotification({
+          'user_email': notification['email'],
+          'message': 'Item ${notification['item_name']} is expiring in ${notification['days_left']} days!',
+          'item_id': notification['item_name'], // or actual ID if available
+          'created_at': DateTime.now().toIso8601String(),
+          'status': 'unread',
+        });
+      } catch (e) {
+        print('Failed to write notification to Firestore: $e');
+      }
+    }
+
     return due;
   }
 }
